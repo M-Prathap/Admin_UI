@@ -1,0 +1,38 @@
+.button {
+  display: flex;
+  justify-content: center;
+  gap: 20px; /* buttons gap */
+}
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px; /* buttons gap */
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2; /* adding backround color*/
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2; /* adding backround color*/
+}
+
+tr:hover {
+  background-color: #ddd; /* adding backround color*/
+}
+input[type="checkbox"] {
+  transform: scale(1.5);
+  margin: 0;
+}
