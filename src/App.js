@@ -12,6 +12,7 @@ function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [editingUser, setEditingUser] = useState(null);
+
   // Fetch user data from the API
   useEffect(() => {
     fetch(
@@ -22,9 +23,20 @@ function App() {
       .catch((error) => console.error("Error fetching data: ", error));
   }, []);
 
-  //  function handle Search query data
+  // Function to filter users based on search query
+  const filterUsers = (user) => {
+    const lowerCaseQuery = searchQuery.toLowerCase();
+    return (
+      user.name.toLowerCase().includes(lowerCaseQuery) ||
+      user.email.toLowerCase().includes(lowerCaseQuery) ||
+      user.role.toLowerCase().includes(lowerCaseQuery)
+    );
+  };
+
+  // Function to handle search query change
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
+    setCurrentPage(1); // Reset current page when search query changes
   };
 
   //  function handle the select All selection.
@@ -35,6 +47,7 @@ function App() {
       setSelectedRows(displayedUsers.map((user) => user.id));
     }
   };
+
   const toggleRowSelection = (userId) => {
     // Check if the userId is in the selectedRows array
     const isSelected = selectedRows.includes(userId);
@@ -65,49 +78,42 @@ function App() {
     });
     setUsers(updatedUsers);
     setEditingUser(null);
+    alert("User data saved successfully!");
   };
 
   const handleDeleteRow = (userId) => {
     const updatedUsers = users.filter((user) => user.id !== userId);
     setUsers(updatedUsers);
+    alert("User deleted successfully!");
   };
+
   // Handle delete user data
   const deleteSelectedRows = () => {
-    const updatedUsers = users.filter(
-      (user) => !selectedRows.includes(user.id)
-    );
-    setUsers(updatedUsers);
-    setSelectedRows([]);
+    if (selectedRows.length > 0) {
+      // Display an alert before deleting
+      if (window.confirm("Are you sure you want to delete selected rows?")) {
+        const updatedUsers = users.filter(
+          (user) => !selectedRows.includes(user.id)
+        );
+        setUsers(updatedUsers);
+        setSelectedRows([]);
+        alert("Selected rows deleted successfully!");
+      }
+    } else {
+      // If no rows are selected, show an alert
+      alert("Please select rows to delete.");
+    }
   };
 
-  const totalPages = Math.ceil(
-    users.filter(
-      (user) =>
-        user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.role.toLowerCase().includes(searchQuery.toLowerCase())
-    ).length / itemsPerPage
-  );
-
+  // Calculate total pages based on the filtered users
+  const totalPages = Math.ceil(users.filter(filterUsers).length / itemsPerPage);
   const firstIndex = (currentPage - 1) * itemsPerPage;
   const lastIndex = currentPage * itemsPerPage;
-  const displayedUsers = users
-    .filter(
-      (user) =>
-        user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.role.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    .slice(firstIndex, lastIndex);
+  const displayedUsers = users.filter(filterUsers).slice(firstIndex, lastIndex);
 
   // Pagination controls
-  const handlePageChange = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
   };
 
   return (
